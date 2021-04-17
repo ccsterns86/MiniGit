@@ -33,7 +33,7 @@ class Branch {
         void commit();
         void checkout(int commitNumber);
     private:
-        singlyNode* root;
+        doublyNode* root;
 
 };
 
