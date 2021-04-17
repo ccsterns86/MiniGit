@@ -4,12 +4,15 @@
 using namespace std;
 
 /* ------------------------------------------------------ */
-Branch::Branch()
+void Branch::init()
 {
     // Initialize structure
     if (root == nullptr)
     {
         root = new doublyNode;
+        currCommit = root;
+        // TODO: create minigit folder
+        cout << "Repository successfuly initialized! " << endl;
     }
     else
     {
