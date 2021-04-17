@@ -33,8 +33,8 @@ class Branch {
         void commit();
         void checkout(int commitNumber);
     private:
-        doublyNode* root;
-        doublyNode* currCommit;
+        doublyNode* root = nullptr;
+        doublyNode* currCommit = nullptr;
 };
 
 #endif

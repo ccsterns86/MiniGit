@@ -29,7 +29,11 @@ Branch::~Branch()
     {
         return;
     }
-
+    if (root->head == nullptr)
+    {
+        delete root;
+        return;
+    }
     singlyNode* singleCurr = root->head;
     singlyNode* singlePrev = nullptr;
     while (curr != nullptr)
