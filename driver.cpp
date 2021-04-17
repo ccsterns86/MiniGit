@@ -1,15 +1,18 @@
 #include <iostream>
 #include <fstream>
+#include <dirent.h>
 #include "miniGit.hpp"
 using namespace std;
 
 int main() {
-    string input;
+    string input; 
+    //the first menu to start the initialize process
     cout << "======Menu======" << endl;
     cout << "1. initialize an empty repository" << endl;
     cout << "2. quit" << endl;
-    getline(cin, input);
-    while (input != "1" && input != "2") {
+
+    getline(cin, input); //user input
+    while (input != "1" && input != "2") { //wrong input
         cerr << "Invalid option : " << input << endl;
         cout << "Try again" << endl;
         getline(cin, input);
@@ -18,7 +21,7 @@ int main() {
         cout << "Goodbye" << endl;
         return 0;
     }
-    //else initialize
+    //else: initialize
     Branch repository;
     repository.init();
     //then give the next options
@@ -26,6 +29,7 @@ int main() {
 	while (!quit)
 	{
 		int option;
+        string filename;
         //print menu options
 		cout << "======Main Menu======" << endl;
 		cout << "1. add" << endl;
@@ -38,23 +42,63 @@ int main() {
 		option = stoi(input); //convert to number
 		switch (option) {
 			case 1:
-			{
-				cout << "Adding a file" << endl;
+			{   
+                struct dirent *d;
+                DIR *dr;
+                dr = opendir(".");
+                bool inDirectory = false;
+                string temp;
+                while (!inDirectory) { //check to see if the file is in the directory
+                    cout << "Enter a filename: " << endl;
+                    getline(cin, filename);
+                    if (dr != nullptr) {
+                        for (d = readdir(dr); d != nullptr; d = readdir(dr)) { //check each file individually
+                            if (filename == d->d_name) { //filename found
+                                inDirectory = true;
+                                break;
+                            }
+                        }
+                        closedir(dr);
+                        if (inDirectory == false) { // filename not found
+                            cout << "Invalid filename: try again" << endl;
+                        }
+                    }
+                    else {
+                        cout << "Error in finding files in directory" << endl;
+                    }
+                }	
+                repository.addFile(filename);			
 				break;
 			}
             case 2:
             {
-                cout << "Removing a file" << endl;
+                cout << "Enter a filename: " << endl;
+                getline(cin, filename);
+                repository.removeFile(filename);
                 break;
             }
 			case 3:
             {
-                cout << "Commiting a file" << endl;
+                repository.commit();
                 break;
             }
             case 4:
             {
-                cout << "Checkout a commit number" << endl;
+                int comNum = 0;
+                while(!(comNum > 0 && comNum <= repository.getLastCommitNum())) { //user isn't in valid commit number range
+                    cout << "Enter the commit number you would like to checkout: " << endl;
+                    getline(cin, input);
+                    comNum = stoi(input);
+                    if (!(comNum > 0 && comNum <= repository.getLastCommitNum())) {
+                        cout << "Invalid commit number: try again" << endl;
+                    }
+                }
+                cout << "Warning: all local changes will be erased if you continue." << endl;
+                cout << "Enter 1 if you would like to continue" << endl;
+                getline(cin, input);
+                if (input == "1") {
+                    repository.checkout(comNum);
+                }
                 break;
             }
             case 5:

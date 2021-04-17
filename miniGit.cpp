@@ -53,20 +53,33 @@ Branch::~Branch()
 
 void Branch::addFile(string fileName)
 {
-
+    //I did check to make sure that the file is in the current directory :)
+    cout << "Adding " << fileName << endl; 
+    //I didn't account for if they are trying to add a folder, don't know what to do about this
+    return;
 }
 
 void Branch::removeFile(string fileName)
 {
-
+    //I didn't do any sort of checking if the file existed here.
+    //might want to have a message that says that file wasn't found, or success in removal
+    cout << "Removed " << fileName << endl;
+    return;
 }
 
 void Branch::commit()
 {
-
+    cout << "Committing..." << endl;
+    return;
 }
 
 void Branch::checkout(int commitNumber)
 {
+    cout << "Checking out commit number " << commitNumber << endl;
+    return;
+    // Also note that you must disallow add, remove, and commit operations when the current version is different from the most recent commit (the last DLL node)
+}
 
+int Branch::getLastCommitNum() { //returns most current commit number
+    return currCommit->commitNumber;
 }
