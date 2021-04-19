@@ -43,9 +43,8 @@ int main() {
 		switch (option) {
 			case 1:
 			{   
-                bool inDirectory = false;
                 string temp;
-                while (!inDirectory) { //check to see if the file is in the directory
+                while (true) { //check to see if the file is in the directory
                     cout << "Enter a filename: " << endl;
                     getline(cin, filename);
                     if (!filesystem::exists(filename)) 
