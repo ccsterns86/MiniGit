@@ -84,6 +84,7 @@ void Branch::addFile(string fileName) // TODO: check to see if file has already 
         curr = curr->next;
     }
     prev->next = newFile;
+    cout << newFile->fileName << " has been added" << endl; // Another temporary debug cout
     cout << endl;
     return;
 }

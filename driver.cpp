@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <dirent.h>
+#include <filesystem>
 #include "miniGit.hpp"
 using namespace std;
 
@@ -43,29 +43,16 @@ int main() {
 		switch (option) {
 			case 1:
 			{   
-                struct dirent *d;
-                DIR *dr;
-                dr = opendir(".");
                 bool inDirectory = false;
                 string temp;
                 while (!inDirectory) { //check to see if the file is in the directory
                     cout << "Enter a filename: " << endl;
                     getline(cin, filename);
-                    if (dr != nullptr) {
-                        for (d = readdir(dr); d != nullptr; d = readdir(dr)) { //check each file individually
-                            if (filename == d->d_name) { //filename found
-                                inDirectory = true;
-                                break;
-                            }
-                        }
-                        closedir(dr);
-                        if (inDirectory == false) { // filename not found
-                            cout << "Invalid filename: try again" << endl;
-                        }
+                    if (!filesystem::exists(filename)) 
+                    { // filename not found
+                        cout << "Invalid filename: try again" << endl;
                     }
-                    else {
-                        cout << "Error in finding files in directory" << endl;
-                    }
+                    else break;
                 }	
                 repository.addFile(filename);			
 				break;
