@@ -25,7 +25,7 @@ void Branch::init()
     }
 }
 
-Branch::~Branch()
+Branch::~Branch() // TODO: fix crashing bug for when nodes are populated
 {
     doublyNode* curr = root;
     doublyNode* prev = nullptr;
@@ -47,6 +47,7 @@ Branch::~Branch()
         {
             singlePrev = singleCurr;
             singleCurr = singleCurr->next;
+            cout << "Deleting: " << singlePrev->fileName << endl;
             delete singlePrev;
         }
         prev = curr;
@@ -56,7 +57,7 @@ Branch::~Branch()
     }
 }
 
-void Branch::addFile(string fileName)
+void Branch::addFile(string fileName) // TODO: check to see if file has already been added
 {
     //I did check to make sure that the file is in the current directory :)
     cout << "Adding " << fileName << "..." << endl; 
@@ -91,7 +92,52 @@ void Branch::removeFile(string fileName)
 {
     //I didn't do any sort of checking if the file existed here.
     //might want to have a message that says that file wasn't found, or success in removal
-    cout << "Removed " << fileName << endl;
+    if(filesystem::exists(fileName))
+    {
+        singlyNode* prev = nullptr;
+        singlyNode* cursor = currCommit->head;
+
+        if (cursor == nullptr)
+        {
+            cout << "No files have been added to this commit!" << endl;
+        }
+
+        while (true)
+        {
+            if (cursor->fileName == fileName) break;
+            else
+            {
+                prev = cursor;
+                cursor = cursor->next;
+            }
+        }
+        if (cursor == currCommit->head) // Delete the head node
+        {
+            if (cursor->next = nullptr) // If it's the only node in the LL
+            {
+                delete currCommit->head;
+                currCommit->head = 0;
+            }
+            else // Deleting the head w/ other nodes in the LL
+            {
+                singlyNode* forward = cursor->next;
+                delete cursor;
+                currCommit->head = forward;
+            }
+        }
+        else // Was not the head node
+        {
+            singlyNode* forward = cursor->next;
+            delete cursor;
+            prev->next = forward;
+        }
+    }
+    else
+    {
+        cout << "File does not exist! " << endl;
+        return;
+    }
+    cout << "Removed " << fileName << " successfully." << endl;
     return;
 }
 
