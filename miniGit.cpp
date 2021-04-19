@@ -59,8 +59,31 @@ Branch::~Branch()
 void Branch::addFile(string fileName)
 {
     //I did check to make sure that the file is in the current directory :)
-    cout << "Adding " << fileName << endl; 
+    cout << "Adding " << fileName << "..." << endl; 
     //I didn't account for if they are trying to add a folder, don't know what to do about this
+    
+    // My current interpretation:
+    singlyNode* newFile = new singlyNode;
+    newFile->fileName = fileName;
+    newFile->fileVersion = 1.0; // NOTE: we probably need some way to update this or get this value
+    singlyNode* curr = currCommit->head;
+    singlyNode* prev = nullptr;
+
+    // Case: new node is the first node
+    if (curr == nullptr)
+    {
+        currCommit->head = newFile;
+        return;
+    }
+
+    while (curr != nullptr)
+    {
+        cout << curr->fileName << " has been added" << endl; // Temporary debug cout for your reference
+        prev = curr;
+        curr = curr->next;
+    }
+    prev->next = newFile;
+    cout << endl;
     return;
 }
 
