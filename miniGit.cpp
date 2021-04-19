@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include "miniGit.hpp"
 using namespace std;
 
@@ -11,7 +12,11 @@ void Branch::init()
     {
         root = new doublyNode;
         currCommit = root;
-        // TODO: create minigit folder
+        if (!filesystem::exists(".minigit"))
+        {
+            // Create the folder
+            filesystem::create_directory(".minigit");
+        }
         cout << "Repository successfuly initialized! " << endl;
     }
     else
