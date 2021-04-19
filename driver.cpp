@@ -115,17 +115,17 @@ int main() {
 }
 
 void checkout(Branch repository, bool revertToHead, bool &isCurrent) {
-    int comNum = 0;
+    int comNum = -1;
     string input;
     if (revertToHead == true) {
         comNum = repository.getLastCommitNum();
     }
     else {
-        while(!(comNum > 0 && comNum <= repository.getLastCommitNum())) { //user isn't in valid commit number range
+        while(!(comNum >= 0 && comNum <= repository.getLastCommitNum())) { //user isn't in valid commit number range
             cout << "Enter the commit number you would like to checkout: " << endl;
             getline(cin, input);
             comNum = stoi(input);
-            if (!(comNum > 0 && comNum <= repository.getLastCommitNum())) {
+            if (!(comNum >= 0 && comNum <= repository.getLastCommitNum())) {
                 cout << "Invalid commit number: try again" << endl;
             }
         }
