@@ -219,7 +219,7 @@ void Branch::checkout(int commitNumber)
 }
 
 int Branch::getLastCommitNum() { //returns most current commit number
-    return currCommit->commitNumber;
+    return currCommit->previous->commitNumber;
 }
 
 /* -------------------Extra functions------------------- */
