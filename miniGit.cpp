@@ -26,6 +26,7 @@ void Branch::init()
 }
 
 Branch::~Branch() // TODO: fix crashing bug for when nodes are populated
+// Also: do we care if there are already files in the minigit, or should we delete them all? This will make the reopening previous a little harder, unless you want to make an additional folder
 {
     doublyNode* curr = root;
     doublyNode* prev = nullptr;
@@ -34,7 +35,7 @@ Branch::~Branch() // TODO: fix crashing bug for when nodes are populated
     {
         return;
     }
-    if (root->head == nullptr)
+    if (root->head == nullptr) 
     {
         delete root;
         return;

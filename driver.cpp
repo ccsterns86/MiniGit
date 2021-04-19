@@ -4,6 +4,9 @@
 #include "miniGit.hpp"
 using namespace std;
 
+//function declaration
+void checkout(Branch repository, bool revertToHead, bool &isCurrent);
+
 int main() {
     string input; 
     //the first menu to start the initialize process
@@ -26,78 +29,117 @@ int main() {
     repository.init();
     //then give the next options
     bool quit = false;
+    bool isCurrent = true;
 	while (!quit)
 	{
 		int option;
         string filename;
-        //print menu options
-		cout << "======Main Menu======" << endl;
-		cout << "1. add" << endl;
-        cout << "2. rm" << endl;
-		cout << "3. commit" << endl;
-        cout << "4. checkout" << endl;
-        cout << "5. quit" << endl;
-
-		getline(cin, input);
-		option = stoi(input); //convert to number
-		switch (option) {
-			case 1:
-			{   
-                string temp;
-                while (true) { //check to see if the file is in the directory
-                    cout << "Enter a filename: " << endl;
-                    getline(cin, filename);
-                    if (!filesystem::exists(filename)) 
-                    { // filename not found
-                        cout << "Invalid filename: try again" << endl;
-                    }
-                    else break;
-                }	
-                repository.addFile(filename);			
-				break;
-			}
+        
+        if (!isCurrent) { // if the user isn't on the most current commit
+            cout << "======Menu======" << endl;
+            cout << "1. checkout" << endl;
+            cout << "2. return to head" << endl;
+            getline(cin, input);
+            option = stoi(input); //convert to number
+            switch (option)
+            {
+            case 1:
+                checkout(repository, false, isCurrent);
+                break;
             case 2:
-            {
-                cout << "Enter a filename: " << endl;
-                getline(cin, filename);
-                repository.removeFile(filename);
+                checkout(repository, true, isCurrent);
                 break;
-            }
-			case 3:
-            {
-                repository.commit();
-                break;
-            }
-            case 4:
-            {
-                int comNum = 0;
-                while(!(comNum > 0 && comNum <= repository.getLastCommitNum())) { //user isn't in valid commit number range
-                    cout << "Enter the commit number you would like to checkout: " << endl;
-                    getline(cin, input);
-                    comNum = stoi(input);
-                    if (!(comNum > 0 && comNum <= repository.getLastCommitNum())) {
-                        cout << "Invalid commit number: try again" << endl;
-                    }
-                }
-                cout << "Warning: all local changes will be erased if you continue." << endl;
-                cout << "Enter 1 if you would like to continue" << endl;
-                getline(cin, input);
-                if (input == "1") {
-                    repository.checkout(comNum);
-                }
-                break;
-            }
-            case 5:
-			{
-				quit = true;
-                break;
-			}
             default:
-            {
                 cerr << "Invalid option : " << input << endl;
                 break;
             }
         }
+        else {
+            //print menu options
+            cout << "======Menu======" << endl;
+            cout << "1. add" << endl;
+            cout << "2. rm" << endl;
+            cout << "3. commit" << endl;
+            cout << "4. checkout" << endl;
+            cout << "5. quit" << endl;
+
+            getline(cin, input);
+            option = stoi(input); //convert to number
+            switch (option) {
+                case 1:
+                {   
+                    string temp;
+                    while (true) { //check to see if the file is in the directory
+                        cout << "Enter a filename: " << endl;
+                        getline(cin, filename);
+                        if (!filesystem::exists(filename)) 
+                        { // filename not found
+                            cout << "Invalid filename: try again" << endl;
+                        }
+                        else break;
+                    }	
+                    repository.addFile(filename);			
+                    break;
+                }
+                case 2:
+                {
+                    cout << "Enter a filename: " << endl;
+                    getline(cin, filename);
+                    repository.removeFile(filename);
+                    break;
+                }
+                case 3:
+                {
+                    repository.commit();
+                    break;
+                }
+                case 4:
+                {
+                    checkout(repository, false, isCurrent);
+                    break;
+                }
+                case 5:
+                {
+                    quit = true;
+                    break;
+                }
+                default:
+                {
+                    cerr << "Invalid option : " << input << endl;
+                    break;
+                }
+            }
+        }
 	}
     cout << "Goodbye" << endl;
+}
+
+void checkout(Branch repository, bool revertToHead, bool &isCurrent) {
+    int comNum = 0;
+    string input;
+    if (revertToHead == true) {
+        comNum = repository.getLastCommitNum();
+    }
+    else {
+        while(!(comNum > 0 && comNum <= repository.getLastCommitNum())) { //user isn't in valid commit number range
+            cout << "Enter the commit number you would like to checkout: " << endl;
+            getline(cin, input);
+            comNum = stoi(input);
+            if (!(comNum > 0 && comNum <= repository.getLastCommitNum())) {
+                cout << "Invalid commit number: try again" << endl;
+            }
+        }
+    }
+    cout << "Warning: all local changes will be erased if you continue." << endl;
+    cout << "Enter 1 if you would like to continue" << endl;
+    getline(cin, input);
+    if (input == "1") {
+        if (comNum == repository.getLastCommitNum()) {
+            isCurrent = true;
+        }
+        else {
+            isCurrent = false;
+        }
+        repository.checkout(comNum);
+    }
 }
