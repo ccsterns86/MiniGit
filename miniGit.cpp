@@ -35,32 +35,27 @@ Branch::~Branch() // TODO: fix crashing bug for when nodes are populated
 {
     doublyNode* curr = root;
     doublyNode* prev = nullptr;
-
-    if (curr == nullptr) // Case for empty branch
-    {
-        return;
-    }
-    if (root->head == nullptr) 
-    {
-        delete root;
-        return;
-    }
     singlyNode* singleCurr = root->head;
     singlyNode* singlePrev = nullptr;
-    while (curr != nullptr)
+
+    if (root == nullptr) // Case for empty branch
     {
-        while(singleCurr != nullptr)
-        {
-            singlePrev = singleCurr;
-            singleCurr = singleCurr->next;
-            cout << "Deleting: " << singlePrev->fileName << endl;
-            delete singlePrev;
-        }
-        prev = curr;
-        curr = curr->next;
-        singleCurr = curr->head;
-        delete prev;
+        return;
     }
+    while (root != nullptr) {
+        while (curr->head != nullptr) {
+            //cout << "deleting: " << curr->head->fileVersion << endl;
+            curr->head = curr->head->next;
+            delete singleCurr;
+            singleCurr = curr->head;
+        }
+        //cout << "~Deleted Commit: " << curr->commitNumber << endl;
+        root = root->next;
+        delete curr;
+        curr = root;
+    }
+    //cout << "Deleted all commits" << endl;  
+      
 }
 
 void Branch::addFile(string fileName) // TODO: check to see if file has already been added
