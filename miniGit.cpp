@@ -8,6 +8,7 @@ using namespace std;
 //extra function declarations
 bool hasChanged(singlyNode *node);
 string readFileIntoString(string filename);
+singlyNode* retreiveCommitHead(int commitNum, doublyNode* root);
 
 /* ------------------------------------------------------ */
 void Branch::init()
@@ -55,7 +56,9 @@ Branch::~Branch() // TODO: fix crashing bug for when nodes are populated
         curr = root;
     }
     //cout << "Deleted all commits" << endl;  
-      
+
+    //to remove everything from the .minigit file
+    filesystem::remove_all(".minigit");
 }
 
 void Branch::addFile(string fileName) // TODO: check to see if file has already been added
@@ -115,23 +118,13 @@ void Branch::removeFile(string fileName)
         }
         if (cursor == currCommit->head) // Delete the head node
         {
-            if (cursor->next = nullptr) // If it's the only node in the LL
-            {
-                delete currCommit->head;
-                currCommit->head = 0;
-            }
-            else // Deleting the head w/ other nodes in the LL
-            {
-                singlyNode* forward = cursor->next;
-                delete cursor;
-                currCommit->head = forward;
-            }
+            currCommit->head = cursor->next;
+            delete cursor;
         }
         else // Was not the head node
         {
-            singlyNode* forward = cursor->next;
+            prev->next = cursor->next;
             delete cursor;
-            prev->next = forward;
         }
     }
     else
@@ -201,13 +194,46 @@ void Branch::commit()
     currCommit->next = newCommit;
     currCommit = newCommit;
 
-    cout << "~Committed~" << endl <<  "Commit Number: " << currCommit->previous->commitNumber << endl;
+    cout << "~*~Committed~*~" << endl <<  "Commit Number: " << currCommit->previous->commitNumber << endl;
     newCommit = nullptr;
     return;
 }
 
-void Branch::checkout(int commitNumber)
+void Branch::checkout(int commitNumber) //TODO: figure out why it deletes the subdirectory? Find out why it isn't finding the correct file contents
+//TODO: delete all changes made to the commit final node
 {
+    singlyNode *commitHead = retreiveCommitHead(commitNumber, root);
+    singlyNode *curr = commitHead;
+    string file;
+    string compFile;
+    string contents;
+    bool found;
+
+    while (curr != nullptr) { //going through each of the items in the chosen commit
+        compFile = "./" + curr->fileName;
+        found = false;
+        for (auto & p : filesystem::directory_iterator(".")) { //going through the directory to see if they exist
+            file = p.path();
+            if (compFile == file) { //file found in the directory
+                contents = readFileIntoString(curr->fileVersion);
+                cout << "-" << contents << endl;
+                ofstream newFile("file.txt");
+                newFile << contents;
+                newFile.close();
+                found = true;
+                //delete the old file
+                break;
+            }
+        }
+        if (found == false) { //isn't a current file in the directory
+            contents = readFileIntoString(curr->fileVersion);
+            ofstream newFile(curr->fileName);
+            newFile << contents;
+            newFile.close();
+        }
+        curr = curr->next;
+    }
+
     cout << "Checking out commit number " << commitNumber << endl;
     return;
     // Also note that you must disallow add, remove, and commit operations when the current version is different from the most recent commit (the last DLL node)
@@ -230,4 +256,12 @@ bool hasChanged(singlyNode *node) {
         return false;
     }
     else return true;
+}
+
+singlyNode* retreiveCommitHead(int commitNum, doublyNode* root) {
+    doublyNode *curr = root;
+    while(curr->commitNumber != commitNum) {
+        curr = curr->next;
+    }
+    return curr->head;
 }
