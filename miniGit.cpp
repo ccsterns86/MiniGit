@@ -31,7 +31,7 @@ void Branch::init()
     }
 }
 
-Branch::~Branch() // TODO: fix crashing bug for when nodes are populated
+void Branch::DeleteBranch() // TODO: fix crashing bug for when nodes are populated
 // Also: do we care if there are already files in the minigit, or should we delete them all? This will make the reopening previous a little harder, unless you want to make an additional folder
 {
     doublyNode* curr = root;
@@ -57,7 +57,7 @@ Branch::~Branch() // TODO: fix crashing bug for when nodes are populated
     }
     //cout << "Deleted all commits" << endl;  
 
-    //to remove everything from the .minigit file
+    //delete all of the minigit
     filesystem::remove_all(".minigit");
 }
 
@@ -70,8 +70,7 @@ void Branch::addFile(string fileName) // TODO: check to see if file has already 
     // My current interpretation:
     singlyNode* newFile = new singlyNode;
     newFile->fileName = fileName;
-    newFile->fileVersion = "01" + fileName; // NOTE: we probably need some way to update this or get this value
-    //fileVersion is the name of the file in the .minigit file and it does need to be updated
+    newFile->fileVersion = "01" + fileName; // NOTE: don't worry about updating, I do this in the commit section
     singlyNode* curr = currCommit->head;
     singlyNode* prev = nullptr;
 
@@ -202,41 +201,40 @@ void Branch::commit()
 void Branch::checkout(int commitNumber) //TODO: figure out why it deletes the subdirectory? Find out why it isn't finding the correct file contents
 //TODO: delete all changes made to the commit final node
 {
+    string input; //remove this
     singlyNode *commitHead = retreiveCommitHead(commitNumber, root);
     singlyNode *curr = commitHead;
     string file;
     string compFile;
     string contents;
-    bool found;
 
     while (curr != nullptr) { //going through each of the items in the chosen commit
         compFile = "./" + curr->fileName;
-        found = false;
         for (auto & p : filesystem::directory_iterator(".")) { //going through the directory to see if they exist
             file = p.path();
             if (compFile == file) { //file found in the directory
-                contents = readFileIntoString(curr->fileVersion);
-                cout << "-" << contents << endl;
-                ofstream newFile("file.txt");
-                newFile << contents;
-                newFile.close();
-                found = true;
                 //delete the old file
+                filesystem::remove(file);
                 break;
             }
         }
-        if (found == false) { //isn't a current file in the directory
-            contents = readFileIntoString(curr->fileVersion);
-            ofstream newFile(curr->fileName);
-            newFile << contents;
-            newFile.close();
-        }
+        //create the document
+        contents = readFileIntoString(".minigit/" + curr->fileVersion);
+        ofstream newFile(curr->fileName); //fix this eventually
+        newFile << contents;
+        newFile.close();
+        //go to next node in the SLL
         curr = curr->next;
     }
-
     cout << "Checking out commit number " << commitNumber << endl;
+    //delete the local changes, ie clear the SLL node
+    singlyNode *deleteer = currCommit->head;
+    while(currCommit->head != nullptr) {
+        currCommit->head = currCommit->head->next;
+        delete deleteer;
+        deleteer = currCommit->head;
+    }
     return;
-    // Also note that you must disallow add, remove, and commit operations when the current version is different from the most recent commit (the last DLL node)
 }
 
 int Branch::getLastCommitNum() { //returns most current commit number

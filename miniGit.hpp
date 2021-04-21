@@ -26,7 +26,7 @@ struct doublyNode {
 //class that will make up the branches of the repository
 class Branch {
     public:
-        ~Branch();
+        void DeleteBranch();
         void init();
         void addFile(string fileName);
         void removeFile(string fileName);

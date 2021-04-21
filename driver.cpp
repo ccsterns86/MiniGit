@@ -101,6 +101,7 @@ int main() {
                 case 5:
                 {
                     quit = true;
+                    repository.DeleteBranch();
                     break;
                 }
                 default:
