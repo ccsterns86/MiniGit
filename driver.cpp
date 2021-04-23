@@ -39,6 +39,7 @@ int main() {
             cout << "======Menu======" << endl;
             cout << "1. checkout" << endl;
             cout << "2. return to head" << endl;
+
             getline(cin, input);
             option = stoi(input); //convert to number
             switch (option)
@@ -61,7 +62,8 @@ int main() {
             cout << "2. rm" << endl;
             cout << "3. commit" << endl;
             cout << "4. checkout" << endl;
-            cout << "5. quit" << endl;
+            cout << "5. status" << endl;
+            cout << "6. quit" << endl;
 
             getline(cin, input);
             if (input[0] < '0' || input [0] > '9' || input.size() > 1)
@@ -100,10 +102,15 @@ int main() {
                 }
                 case 4:
                 {
-                    checkout(repository, false, isCurrent);
+                    checkout(repository, false, isCurrent);             
                     break;
                 }
                 case 5:
+                {
+                    repository.printStatus();
+                    break;
+                }
+                case 6:
                 {
                     quit = true;
                     repository.DeleteBranch();

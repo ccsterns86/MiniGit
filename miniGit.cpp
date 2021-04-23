@@ -9,6 +9,7 @@ using namespace std;
 bool hasChanged(singlyNode *node);
 string readFileIntoString(string filename);
 singlyNode* retreiveCommitHead(int commitNum, doublyNode* root);
+void printOutDifferences(singlyNode *node);
 
 /* ------------------------------------------------------ */
 void Branch::init()
@@ -108,12 +109,12 @@ void Branch::addFile(string fileName)
     //TODO: need to check if the file has already been added, check while already looping through. Maybe check if it isn't a repeat before making a node?
     while (curr != nullptr)
     {
-        cout << curr->fileName << " has been added" << endl; // Temporary debug cout for your reference
+        //cout << curr->fileName << " has been added" << endl; // Temporary debug cout for your reference
         prev = curr;
         curr = curr->next;
     }
     prev->next = newFile;
-    cout << newFile->fileName << " has been added" << endl; // Another temporary debug cout
+    //cout << newFile->fileName << " has been added" << endl; // Another temporary debug cout
     cout << endl;
     return;
 }
@@ -242,9 +243,7 @@ void Branch::addCommit(doublyNode* currCommit)
 void Branch::checkout(int commitNumber) //TODO: figure out why it deletes the subdirectory? Find out why it isn't finding the correct file contents
 //TODO: delete all changes made to the commit final node
 {
-    string input; //remove this
-    singlyNode *commitHead = retreiveCommitHead(commitNumber, root);
-    singlyNode *curr = commitHead;
+    singlyNode *curr = retreiveCommitHead(commitNumber, root);
     string file;
     string compFile;
     string contents;
@@ -268,18 +267,64 @@ void Branch::checkout(int commitNumber) //TODO: figure out why it deletes the su
         curr = curr->next;
     }
     cout << "Checking out commit number " << commitNumber << endl;
-    //delete the local changes, ie clear the SLL node
-    singlyNode *deleteer = currCommit->head;
-    while(currCommit->head != nullptr) {
-        currCommit->head = currCommit->head->next;
-        delete deleteer;
-        deleteer = currCommit->head;
-    }
     return;
 }
 
 int Branch::getLastCommitNum() { //returns most current commit number
     return currCommit->previous->commitNumber;
+}
+
+void Branch::printStatus() {
+    if (currCommit->head == nullptr) { //if nothing in the repository
+        cout << "Nothing in the repository, add something to see status" << endl;
+        return;
+    }
+
+    string minifile;
+    singlyNode *curr = currCommit->head;
+    bool modified = false;
+    bool newFile = false;
+    bool changed;
+    
+    while (curr != nullptr) { //go through each node in the SLL to see if it has changed
+        minifile = ".minigit/" + curr->fileVersion;
+        if (!filesystem::exists(minifile)) { //file just added, so there are changes
+            cout << "new file: " << curr->fileName << endl;
+            newFile = true;
+        }
+        else { //check if the file has been modified
+            changed = hasChanged(curr);
+            if (changed == true) {
+                cout << "modified: " << curr->fileName << endl;
+                modified = true;
+            }
+        }
+        curr = curr->next;
+    }
+    if (modified == false && newFile == false) { //nothing was modified
+        cout << "commit up to date" << endl;
+    }
+    else if (newFile == true) {
+        cout << "commit changes to commit file" << endl;
+    }
+    else { //check to see if they want to see the differences
+        cout << "If you would like to see the differences enter 1, else enter anything else" << endl;
+        string input;
+        getline(cin, input);
+        if (input == "1") { //want to see the differences
+            curr = currCommit->head;
+            while (curr != nullptr) {
+                minifile = ".minigit/" + curr->fileVersion;
+                if(filesystem::exists(minifile)) { //if the file exists
+                    changed = hasChanged(curr);
+                    if (changed == true) { //if the file has changed
+                        printOutDifferences(curr);
+                    }
+                }
+                curr = curr->next;
+            }
+        }
+    }
 }
 
 /* -------------------Extra functions------------------- */
@@ -303,4 +348,24 @@ singlyNode* retreiveCommitHead(int commitNum, doublyNode* root) {
         curr = curr->next;
     }
     return curr->head;
+}
+
+void printOutDifferences(singlyNode *node) {
+    string minifileName = ".minigit/" + node->fileVersion;
+    string commitLine = "";
+    string currentLine = "";
+    fstream currentFile;
+    currentFile.open(node->fileName);
+    fstream commitFile;
+    commitFile.open(minifileName);
+    while (getline(commitFile, commitLine) && getline(currentFile, currentLine)) {
+        if (commitLine != currentLine) {
+            cout << "File: " << node->fileName << endl;
+            cout << "Difference (if the two are the same, a line has been added or removed): " << endl;
+            cout << "commited: " << commitLine << endl;
+            cout << "current: " << currentLine << endl;
+        }
+    }
+    currentFile.close();
+    commitFile.close();
 }
