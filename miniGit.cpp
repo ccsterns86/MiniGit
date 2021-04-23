@@ -14,21 +14,26 @@ singlyNode* retreiveCommitHead(int commitNum, doublyNode* root);
 void Branch::init()
 {
     // Initialize structure
-    if (root == nullptr)
+    root = new doublyNode;
+    currCommit = root;
+    if (!filesystem::exists(".minigit"))
     {
-        root = new doublyNode;
-        currCommit = root;
-        if (!filesystem::exists(".minigit"))
-        {
-            // Create the folder
-            filesystem::create_directory(".minigit");
-        }
+        // Create the folder and associated files
+        filesystem::create_directory(".minigit");
+        ofstream gitMgr;
+        gitMgr.open(".minigit/gitframe.txt");
         cout << "Repository successfuly initialized! " << endl;
-    }
+        gitMgr.close();
+    }    
     else
     {
-        cerr << "This repository has already been initialized!" << endl;
+        cerr << "This repository has already been initialized!  Populating..." << endl;
     }
+}
+
+void Branch::populate()
+{
+    // TODO -- populate nodes based on file data
 }
 
 void Branch::DeleteBranch() // TODO: fix crashing bug for when nodes are populated
@@ -69,6 +74,7 @@ bool isNewNode(singlyNode* cursor, string key)
         {
             return false;
         }
+        cursor = cursor->next;
     }
     return true;
 }
@@ -84,7 +90,7 @@ void Branch::addFile(string fileName)
     newFile->fileName = fileName;
     newFile->fileVersion = "01" + fileName; // NOTE: don't worry about updating, I do this in the commit section
     
-    if (!isNewNode(root->head, newFile->fileName)) // Case for if that file has already been added
+    if (!isNewNode(currCommit->head, newFile->fileName)) // Case for if that file has already been added
     {
         cout << "This file has already been added!" << endl;
         return;
@@ -213,8 +219,15 @@ void Branch::commit()
     currCommit = newCommit;
 
     cout << "~*~Committed~*~" << endl <<  "Commit Number: " << currCommit->previous->commitNumber << endl;
+    addCommit(currCommit->previous->commitNumber); // Save changes to the document
     newCommit = nullptr;
     return;
+}
+
+void Branch::addCommit(int commitNumber)
+{
+    ofstream writeFile (".minigit/gitframe.txt", ios::app);
+    writeFile << "bungus" << endl;
 }
 
 void Branch::checkout(int commitNumber) //TODO: figure out why it deletes the subdirectory? Find out why it isn't finding the correct file contents

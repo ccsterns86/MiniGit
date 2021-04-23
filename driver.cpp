@@ -11,7 +11,7 @@ int main() {
     string input; 
     //the first menu to start the initialize process
     cout << "======Menu======" << endl;
-    cout << "1. initialize an empty repository" << endl;
+    cout << "1. initialize" << endl;  // Changed to initialize because it will do so regardless of the directory's existence
     cout << "2. quit" << endl;
 
     getline(cin, input); //user input

@@ -32,6 +32,8 @@ class Branch {
         void removeFile(string fileName);
         void commit();
         void checkout(int commitNumber);
+        void populate(); // serialization
+        void addCommit(int commitNumber); // also serialization
         int getLastCommitNum();
     private:
         doublyNode* root = nullptr;
