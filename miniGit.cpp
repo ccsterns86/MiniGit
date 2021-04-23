@@ -58,10 +58,22 @@ void Branch::DeleteBranch() // TODO: fix crashing bug for when nodes are populat
     //cout << "Deleted all commits" << endl;  
 
     //delete all of the minigit
-    filesystem::remove_all(".minigit");
+    // filesystem::remove_all(".minigit"); // A cool debug line, but if we do saving, it can't be used :(
 }
 
-void Branch::addFile(string fileName) // TODO: check to see if file has already been added
+bool isNewNode(singlyNode* cursor, string key)
+{
+    while(cursor != nullptr)
+    {
+        if (cursor->fileName == key)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Branch::addFile(string fileName)
 {
     //I did check to make sure that the file is in the current directory :)
     cout << "Adding " << fileName << "..." << endl; 
@@ -71,6 +83,13 @@ void Branch::addFile(string fileName) // TODO: check to see if file has already 
     singlyNode* newFile = new singlyNode;
     newFile->fileName = fileName;
     newFile->fileVersion = "01" + fileName; // NOTE: don't worry about updating, I do this in the commit section
+    
+    if (!isNewNode(root->head, newFile->fileName)) // Case for if that file has already been added
+    {
+        cout << "This file has already been added!" << endl;
+        return;
+    }
+
     singlyNode* curr = currCommit->head;
     singlyNode* prev = nullptr;
 
