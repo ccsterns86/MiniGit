@@ -84,17 +84,17 @@ void Branch::addFile(string fileName)
     //I did check to make sure that the file is in the current directory :)
     cout << "Adding " << fileName << "..." << endl; 
     //I didn't account for if they are trying to add a folder, don't know what to do about this
+
+    if (!isNewNode(currCommit->head, fileName)) // Case for if that file has already been added
+    {
+        cout << "This file has already been added!" << endl;
+        return;
+    }
     
     // My current interpretation:
     singlyNode* newFile = new singlyNode;
     newFile->fileName = fileName;
     newFile->fileVersion = "01" + fileName; // NOTE: don't worry about updating, I do this in the commit section
-    
-    if (!isNewNode(currCommit->head, newFile->fileName)) // Case for if that file has already been added
-    {
-        cout << "This file has already been added!" << endl;
-        return;
-    }
 
     singlyNode* curr = currCommit->head;
     singlyNode* prev = nullptr;
