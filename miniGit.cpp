@@ -219,15 +219,24 @@ void Branch::commit()
     currCommit = newCommit;
 
     cout << "~*~Committed~*~" << endl <<  "Commit Number: " << currCommit->previous->commitNumber << endl;
-    addCommit(currCommit->previous->commitNumber); // Save changes to the document
+    addCommit(currCommit->previous); // Save changes to the document
     newCommit = nullptr;
     return;
 }
 
-void Branch::addCommit(int commitNumber)
+void Branch::addCommit(doublyNode* currCommit)
 {
     ofstream writeFile (".minigit/gitframe.txt", ios::app);
-    writeFile << "bungus" << endl;
+    //writeFile << "bungus" << endl;
+    singlyNode* writer = currCommit->head;
+    while (writer != nullptr)
+    {
+        writeFile << writer->fileName << endl;
+        writeFile << writer->fileVersion << endl;
+        writer = writer->next;
+    }
+    writeFile << "+++" << endl;
+    writeFile.close();
 }
 
 void Branch::checkout(int commitNumber) //TODO: figure out why it deletes the subdirectory? Find out why it isn't finding the correct file contents

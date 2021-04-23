@@ -64,7 +64,12 @@ int main() {
             cout << "5. quit" << endl;
 
             getline(cin, input);
-            option = stoi(input); //convert to number
+            if (input[0] < '0' || input [0] > '9' || input.size() > 1)
+            {
+                option = 99;
+            }
+            else option = stoi(input); //convert to number
+            
             switch (option) {
                 case 1:
                 {   

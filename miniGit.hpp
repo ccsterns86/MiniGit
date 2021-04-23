@@ -33,7 +33,7 @@ class Branch {
         void commit();
         void checkout(int commitNumber);
         void populate(); // serialization
-        void addCommit(int commitNumber); // also serialization
+        void addCommit(doublyNode* currCommit); // also serialization
         int getLastCommitNum();
     private:
         doublyNode* root = nullptr;
