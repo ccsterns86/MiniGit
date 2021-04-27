@@ -15,6 +15,7 @@ void printOutDifferences(singlyNode *node);
 void Branch::init()
 {
         // Initialize structure
+        filesystem::create_directory(".minigit");
         root = new doublyNode;
         currCommit = root;
         cout << "Repository successfuly initialized! " << endl;
@@ -47,7 +48,7 @@ void Branch::DeleteBranch() // TODO: fix crashing bug for when nodes are populat
     //cout << "Deleted all commits" << endl;  
 
     //delete all of the minigit
-    // filesystem::remove_all(".minigit"); // A cool debug line, but if we do saving, it can't be used :(
+    filesystem::remove_all(".minigit"); // A cool debug line, but if we do saving, it can't be used :(
 }
 
 bool isNewNode(singlyNode* cursor, string key)
