@@ -12,4 +12,3 @@ Primary Features:
 
 Additional Features:
 - Status and Difference in file detection (prints line where the two files differ)
-- Serialization: allows user to quit minigit without having to worry about backup files becoming inaccessable (save feature)
