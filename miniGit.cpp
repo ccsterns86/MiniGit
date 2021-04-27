@@ -14,94 +14,11 @@ void printOutDifferences(singlyNode *node);
 /* ------------------------------------------------------ */
 void Branch::init()
 {
-    // Initialize structure
-    root = new doublyNode;
-    currCommit = root;
-    if (!filesystem::exists(".minigit"))
-    {
-        // Create the folder and associated files
-        filesystem::create_directory(".minigit");
-        ofstream gitMgr;
-        gitMgr.open(".minigit/gitframe.txt");
+        // Initialize structure
+        root = new doublyNode;
+        currCommit = root;
         cout << "Repository successfuly initialized! " << endl;
-        gitMgr.close();
-    }    
-    else
-    {
-        cerr << "This repository has already been initialized!  Populating..." << endl;
-        populate();
     }
-}
-
-void Branch::populate() // Bonus code :D
-{
-    // TODO -- populate nodes based on file data
-    ifstream reader;
-    string lineRead = "";
-    int commitNumber = 0;
-
-    // Prepare initial nodes
-    doublyNode* curr = nullptr;
-    doublyNode* prev = nullptr;
-    singlyNode* singlyCurr = nullptr;
-    singlyNode* singlyPrev = nullptr;
-
-    reader.open(".minigit/gitframe.txt");
-    while(getline(reader, lineRead))
-    {
-        if (lineRead == "+++")
-        {
-            if (commitNumber == 0)
-            {
-                cout << lineRead << " is first DoublyNode!  Commit number: " << commitNumber << endl;
-                curr = root;
-                curr->head = nullptr;
-                curr->commitNumber = 0;
-                commitNumber++;
-            }
-            else
-            {
-                commit(true);
-                curr = root;
-                while (curr != nullptr)
-                {
-                    prev = curr;
-                    curr = curr->next;
-                }
-                curr = prev;
-            }
-        }
-        else if (lineRead[0] >= '0' && lineRead[0] <= '9')
-        {
-            cout << lineRead << " was read as a file version for " << singlyCurr->fileName << endl;
-            singlyCurr->fileVersion = lineRead;
-        }
-        else
-        {
-            if (curr->head == nullptr)
-            {
-                curr->head = new singlyNode;
-                singlyCurr = curr->head;
-                singlyCurr->fileName = lineRead;
-            }
-            else
-            {
-                singlyCurr->next = new singlyNode;
-                singlyPrev = singlyCurr;
-                singlyCurr = singlyCurr->next;
-                singlyPrev->next = singlyCurr;
-                singlyCurr->fileName = lineRead;
-            }
-            cout << lineRead << " was read as a file name" << endl;
-            singlyCurr->fileName = lineRead;
-        }
-    }
-    commit(true);
-    for (int i = 0; i < 99; i++) // Clear screen
-    {
-        cout << endl;
-    }
-}
 
 void Branch::DeleteBranch() // TODO: fix crashing bug for when nodes are populated
 // Also: do we care if there are already files in the minigit, or should we delete them all? This will make the reopening previous a little harder, unless you want to make an additional folder
@@ -227,7 +144,7 @@ void Branch::removeFile(string fileName)
     return;
 }
 
-void Branch::commit(bool populate)
+void Branch::commit()
 {
     if (currCommit->head == nullptr) { //if there is nothing in the list yet
         cout << "Nothing to commit. Add something to commit." << endl;
@@ -286,23 +203,8 @@ void Branch::commit(bool populate)
     currCommit = newCommit;
 
     cout << "~*~Committed~*~" << endl <<  "Commit Number: " << currCommit->previous->commitNumber << endl;
-    if (!populate) addCommit(currCommit->previous); // Save changes to the document
     newCommit = nullptr;
     return;
-}
-
-void Branch::addCommit(doublyNode* currCommit)
-{
-    ofstream writeFile (".minigit/gitframe.txt", ios::app);
-    singlyNode* writer = currCommit->head;
-    writeFile << "+++" << endl;
-    while (writer != nullptr)
-    {
-        writeFile << writer->fileName << endl;
-        writeFile << writer->fileVersion << endl;
-        writer = writer->next;
-    }
-    writeFile.close();
 }
 
 void Branch::checkout(int commitNumber) //TODO: figure out why it deletes the subdirectory? Find out why it isn't finding the correct file contents
