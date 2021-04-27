@@ -97,7 +97,7 @@ int main() {
                 }
                 case 3:
                 {
-                    repository.commit();
+                    repository.commit(false);
                     break;
                 }
                 case 4:

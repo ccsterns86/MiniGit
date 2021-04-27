@@ -30,7 +30,7 @@ class Branch {
         void init();
         void addFile(string fileName);
         void removeFile(string fileName);
-        void commit();
+        void commit(bool populate);
         void checkout(int commitNumber);
         void populate(); // serialization
         void addCommit(doublyNode* currCommit); // also serialization
